@@ -492,6 +492,30 @@ export function renderizar_para_exportacion(
     max_y = Math.max(max_y, nodo.y + nodo.alto);
   }
 
+  // Incluir espacio para barras de grupo (se dibujan encima de los nodos)
+  for (const grupo of modelo.grupos) {
+    const nodos_grupo = modelo.nodos.filter((n) => grupo.nodos.includes(n.id));
+    if (nodos_grupo.length === 0) continue;
+
+    let g_min_x = Infinity;
+    let g_min_y = Infinity;
+    let g_max_x = -Infinity;
+    let g_max_y = -Infinity;
+
+    for (const n of nodos_grupo) {
+      g_min_x = Math.min(g_min_x, n.x);
+      g_min_y = Math.min(g_min_y, n.y);
+      g_max_x = Math.max(g_max_x, n.x + n.ancho);
+      g_max_y = Math.max(g_max_y, n.y + n.alto);
+    }
+
+    // La barra de grupo se dibuja PADDING_GRUPO arriba y ALTO_BARRA_GRUPO más arriba aún
+    min_x = Math.min(min_x, g_min_x - PADDING_GRUPO);
+    min_y = Math.min(min_y, g_min_y - PADDING_GRUPO - ALTO_BARRA_GRUPO);
+    max_x = Math.max(max_x, g_max_x + PADDING_GRUPO);
+    max_y = Math.max(max_y, g_max_y + PADDING_GRUPO);
+  }
+
   const padding = 40;
   const ancho = (max_x - min_x + padding * 2) * escala;
   const alto = (max_y - min_y + padding * 2) * escala;

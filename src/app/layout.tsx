@@ -12,6 +12,7 @@ import { ProveedorAplicacion } from '@/componentes/proveedor-aplicacion';
  * Metadata de la aplicación para SEO y accesibilidad.
  */
 export const metadata: Metadata = {
+  metadataBase: new URL('https://es-ldmd.antaresgt.com'),
   title: 'es-ldmd - Editor de Diagramas Entidad Relación',
   description: 'Herramienta para crear diagramas de entidad relación usando un lenguaje de modelado en español.',
   keywords: ['diagrama', 'entidad-relación', 'base de datos', 'modelado', 'español', 'SQL'],

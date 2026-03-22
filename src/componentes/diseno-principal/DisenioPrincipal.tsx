@@ -55,6 +55,7 @@ const RETARDO_ANALISIS = 300;
 export function DisenioPrincipal() {
   const [codigo_fuente, fijarCodigoFuente] = useState<string>(DOCUMENTO_EJEMPLO);
   const [modelo_diagrama, fijarModeloDiagrama] = useState<ModeloDiagrama | null>(null);
+  const [modelo_con_posiciones_usuario, fijarModeloConPosicionesUsuario] = useState<ModeloDiagrama | null>(null);
   const [tipo_layout, fijarTipoLayout] = useState<TipoLayout>('izquierda-derecha');
   const [ast_actual, fijarAstActual] = useState<DocumentoAST | null>(null);
   const [panel_exportacion_abierto, fijarPanelExportacionAbierto] = useState(false);
@@ -88,6 +89,7 @@ export function DisenioPrincipal() {
   const procesar_codigo = useCallback((codigo: string) => {
     if (!codigo.trim()) {
       fijarModeloDiagrama(null);
+      fijarModeloConPosicionesUsuario(null);
       fijarAstActual(null);
       fijarErrores([]);
       return;
@@ -112,9 +114,11 @@ export function DisenioPrincipal() {
       // Transformar AST a modelo de diagrama
       const modelo = generar_modelo_diagrama(resultado.ast);
       fijarModeloDiagrama(modelo);
+      fijarModeloConPosicionesUsuario(modelo);
     } catch {
       // Si el pipeline falla completamente, limpiar el diagrama
       fijarModeloDiagrama(null);
+      fijarModeloConPosicionesUsuario(null);
       fijarAstActual(null);
       fijarErrores([{
         mensaje: 'Error interno al analizar el código',
@@ -220,6 +224,7 @@ export function DisenioPrincipal() {
     fijarArchivoActualId(null);
     fijarNombreArchivo('Sin título');
     fijarModeloDiagrama(null);
+    fijarModeloConPosicionesUsuario(null);
     fijarAstActual(null);
     fijarErrores([]);
   }, []);
@@ -230,6 +235,7 @@ export function DisenioPrincipal() {
   const manejar_borrar = useCallback(() => {
     fijarCodigoFuente('');
     fijarModeloDiagrama(null);
+    fijarModeloConPosicionesUsuario(null);
     fijarAstActual(null);
     fijarErrores([]);
   }, []);
@@ -439,8 +445,13 @@ export function DisenioPrincipal() {
               al_cambiar_layout={(tipo) => {
                 fijarTipoLayout(tipo);
                 if (ast_actual) {
-                  fijarModeloDiagrama(generar_modelo_diagrama(ast_actual, tipo));
+                  const nuevo_modelo = generar_modelo_diagrama(ast_actual, tipo);
+                  fijarModeloDiagrama(nuevo_modelo);
+                  fijarModeloConPosicionesUsuario(nuevo_modelo);
                 }
+              }}
+              al_cambiar_posiciones={(modelo_actualizado) => {
+                fijarModeloConPosicionesUsuario(modelo_actualizado);
               }}
             />
           </Allotment.Pane>
@@ -459,7 +470,7 @@ export function DisenioPrincipal() {
         abierto={panel_exportacion_abierto}
         al_cerrar={() => fijarPanelExportacionAbierto(false)}
         ast={ast_actual}
-        modelo={modelo_diagrama}
+        modelo={modelo_con_posiciones_usuario}
       />
 
       {/* Modal del gestor de archivos */}

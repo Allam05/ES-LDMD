@@ -34,6 +34,8 @@ interface PropiedadesVistaDiagrama {
   tipo_layout?: TipoLayout;
   /** Callback al cambiar el algoritmo de layout */
   al_cambiar_layout?: (tipo: TipoLayout) => void;
+  /** Callback cuando el usuario mueve nodos (expone modelo con posiciones reales) */
+  al_cambiar_posiciones?: (modelo: ModeloDiagrama) => void;
 }
 
 /**
@@ -66,7 +68,7 @@ const OPCIONES_LAYOUT: { tipo: TipoLayout; nombre: string; descripcion: string; 
   },
 ];
 
-export function VistaDiagrama({ modelo, tipo_layout = 'izquierda-derecha', al_cambiar_layout }: PropiedadesVistaDiagrama) {
+export function VistaDiagrama({ modelo, tipo_layout = 'izquierda-derecha', al_cambiar_layout, al_cambiar_posiciones }: PropiedadesVistaDiagrama) {
   const canvas_ref = useRef<HTMLCanvasElement>(null);
   const contenedor_ref = useRef<HTMLDivElement>(null);
   const vista_ref = useRef<EstadoVista>(crear_estado_vista_inicial());
@@ -383,15 +385,27 @@ export function VistaDiagrama({ modelo, tipo_layout = 'izquierda-derecha', al_ca
 
   /**
    * Maneja el fin del arrastre.
+   * Si se movió un nodo o grupo, notifica al padre con el modelo actualizado.
    */
   const manejar_raton_arriba = useCallback(() => {
+    const hubo_arrastre_nodo = nodo_arrastrado_ref.current !== null;
+    const hubo_arrastre_grupo = grupo_arrastrado_ref.current !== null;
+
     arrastrando_ref.current = false;
     nodo_arrastrado_ref.current = null;
     grupo_arrastrado_ref.current = null;
     if (canvas_ref.current) {
       canvas_ref.current.style.cursor = 'grab';
     }
-  }, []);
+
+    // Notificar al padre si se movió algo
+    if ((hubo_arrastre_nodo || hubo_arrastre_grupo) && al_cambiar_posiciones) {
+      const modelo_actual = obtener_modelo_renderizado();
+      if (modelo_actual) {
+        al_cambiar_posiciones(modelo_actual);
+      }
+    }
+  }, [al_cambiar_posiciones, obtener_modelo_renderizado]);
 
   // Observar cambios de tamaño del contenedor
   useEffect(() => {
