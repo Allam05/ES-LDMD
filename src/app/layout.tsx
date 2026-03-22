@@ -15,6 +15,27 @@ export const metadata: Metadata = {
   title: 'es-ldmd - Editor de Diagramas Entidad Relación',
   description: 'Herramienta para crear diagramas de entidad relación usando un lenguaje de modelado en español.',
   keywords: ['diagrama', 'entidad-relación', 'base de datos', 'modelado', 'español', 'SQL'],
+  openGraph: {
+    title: 'es-ldmd - Editor de Diagramas Entidad Relación',
+    description: 'Herramienta para crear diagramas de entidad relación usando un lenguaje de modelado en español.',
+    images: [
+      {
+        url: '/imagen_seo.png',
+        width: 1200,
+        height: 630,
+        alt: 'es-ldmd - Español - Lenguaje de Modelado de Diagramas',
+      },
+    ],
+    type: 'website',
+    locale: 'es_ES',
+    siteName: 'es-ldmd',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'es-ldmd - Editor de Diagramas Entidad Relación',
+    description: 'Herramienta para crear diagramas de entidad relación usando un lenguaje de modelado en español.',
+    images: ['/imagen_seo.png'],
+  },
 };
 
 /**
